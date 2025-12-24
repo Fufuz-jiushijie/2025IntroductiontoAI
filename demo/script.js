@@ -15,8 +15,17 @@ function fixNav() {
 const generateBtn = document.getElementById('generateBtn');
 const loading = document.getElementById('loading');
 const statusMessage = document.getElementById('statusMessage');
+const inspireToggle = document.getElementById('inspireToggle');
+const inspirePanel = document.getElementById('inspirePanel');
 
 const storageKey = 'generatedImages';
+
+if (inspireToggle && inspirePanel) {
+  inspireToggle.addEventListener('click', () => {
+    inspirePanel.classList.toggle('hidden');
+    inspireToggle.classList.toggle('is-open');
+  });
+}
 
 async function generateImage() {
   const promptInput = document.getElementById('prompt');
@@ -172,6 +181,8 @@ if (canvas) {
   const streaks = [];
   const pointer = { x: null, y: null, radius: 120 };
   const streakPalette = ['#7aa3ff', '#b880ff', '#50e3c2', '#ff7ad9', '#ffd36e'];
+  let streakTimer = 0;
+  const streakInterval = 40;
 
   const resizeCanvas = () => {
     canvas.width = window.innerWidth;
@@ -192,9 +203,6 @@ if (canvas) {
   };
 
   const spawnStreak = () => {
-    if (Math.random() > 0.02) {
-      return;
-    }
     const startX = Math.random() * canvas.width;
     const startY = Math.random() * canvas.height * 0.6;
     const angle = Math.random() * Math.PI * 0.5 - Math.PI * 0.25;
@@ -213,7 +221,11 @@ if (canvas) {
 
   const updateParticles = () => {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    spawnStreak();
+    streakTimer += 1;
+    if (streakTimer >= streakInterval) {
+      streakTimer = 0;
+      spawnStreak();
+    }
 
     particles.forEach((particle) => {
       particle.x += particle.vx;
@@ -229,7 +241,7 @@ if (canvas) {
       if (pointer.x !== null) {
         const dx = particle.x - pointer.x;
         const dy = particle.y - pointer.y;
-        const distance = Math.hypot(dx, dy);
+        const distance = Math.hypot(dx, dy) || 1;
         if (distance < pointer.radius) {
           const force = (pointer.radius - distance) / pointer.radius;
           particle.vx += (dx / distance) * force * 0.3;
@@ -249,7 +261,7 @@ if (canvas) {
       streak.life += 1;
 
       const progress = streak.life / streak.maxLife;
-      const alpha = Math.sin(Math.PI * progress) * 0.6;
+      const alpha = Math.max(0, Math.min(1, Math.sin(Math.PI * progress) * 0.6));
 
       const gradient = ctx.createLinearGradient(
         streak.x,

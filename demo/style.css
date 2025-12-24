@@ -158,27 +158,33 @@ body {
 }
 
 .hero-input,
-.hero-actions,
-.hero-tip {
+.hero-actions {
   text-align: left;
 }
 
+.prompt-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
 .hero-copy label,
-.hero-glass label {
+.inspire-panel label {
   color: rgba(193, 205, 255, 0.9);
 }
 
 .hero-copy textarea,
-.hero-glass textarea,
-.hero-glass input {
+.inspire-panel textarea,
+.inspire-panel input {
   background: rgba(8, 10, 22, 0.8);
   color: #f5f7ff;
   border-color: rgba(122, 163, 255, 0.35);
 }
 
 .hero-copy textarea::placeholder,
-.hero-glass textarea::placeholder,
-.hero-glass input::placeholder {
+.inspire-panel textarea::placeholder,
+.inspire-panel input::placeholder {
   color: rgba(193, 205, 255, 0.6);
 }
 
@@ -203,35 +209,60 @@ body {
   background: rgba(122, 163, 255, 0.22);
 }
 
-.hero-visual {
-  display: flex;
+.inspire-toggle {
+  display: inline-flex;
+  align-items: center;
   justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 1px solid rgba(122, 163, 255, 0.4);
+  background: rgba(15, 18, 36, 0.7);
+  color: #ffd36e;
+  cursor: pointer;
+  position: relative;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.hero-glass {
-  width: min(420px, 100%);
-  background: rgba(16, 20, 44, 0.8);
-  border-radius: 24px;
-  padding: 28px;
-  box-shadow: 0 20px 50px rgba(17, 40, 90, 0.4);
-  backdrop-filter: blur(10px);
-  text-align: left;
+.inspire-toggle:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px rgba(255, 211, 110, 0.2);
 }
 
-.hero-glass h3 {
-  font-size: 20px;
-  font-weight: 700;
-  margin-bottom: 16px;
-  color: #f5f7ff;
+.inspire-toggle.is-open {
+  color: #ffea9f;
+  box-shadow: 0 10px 22px rgba(255, 211, 110, 0.35);
 }
 
-.hero-glass .input-group {
-  margin-bottom: 16px;
+.inspire-tooltip {
+  position: absolute;
+  top: -32px;
+  right: -8px;
+  background: rgba(15, 18, 36, 0.95);
+  color: rgba(240, 244, 255, 0.9);
+  font-size: 12px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(6px);
+  transition: all 0.2s ease;
+  white-space: nowrap;
 }
 
-.hero-tip {
-  font-size: 14px;
-  color: rgba(193, 205, 255, 0.75);
+.inspire-toggle:hover .inspire-tooltip {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.inspire-panel {
+  margin-top: 18px;
+  padding: 18px;
+  border-radius: 18px;
+  border: 1px solid rgba(122, 163, 255, 0.2);
+  background: rgba(12, 15, 30, 0.8);
+  display: grid;
+  gap: 14px;
 }
 
 /* Tailwind自定义工具类 */
