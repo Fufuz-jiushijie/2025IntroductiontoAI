@@ -147,36 +147,63 @@ if (fadeElements.length > 0) {
   });
 }
 
-// 标题鼠标形变
+// 标题鼠标打散效果
 const heroTitle = document.getElementById('heroTitle');
 if (heroTitle) {
+  const originalText = heroTitle.textContent || '';
+  const scatterRadius = 90;
+  const scatterStrength = 18;
+  heroTitle.textContent = '';
+
+  [...originalText].forEach((char) => {
+    const span = document.createElement('span');
+    span.className = 'hero-letter';
+    span.textContent = char === ' ' ? '\u00A0' : char;
+    span.dataset.offsetX = (Math.random() * 2 - 1).toFixed(2);
+    span.dataset.offsetY = (Math.random() * 2 - 1).toFixed(2);
+    span.dataset.rotate = (Math.random() * 2 - 1).toFixed(2);
+    heroTitle.appendChild(span);
+  });
+
+  const resetLetters = () => {
+    heroTitle.querySelectorAll('.hero-letter').forEach((span) => {
+      span.classList.remove('is-scattered');
+      span.style.transform = '';
+      span.style.opacity = '';
+    });
+  };
+
   heroTitle.addEventListener('mousemove', (event) => {
-    const rect = heroTitle.getBoundingClientRect();
-    const relX = (event.clientX - rect.left) / rect.width - 0.5;
-    const relY = (event.clientY - rect.top) / rect.height - 0.5;
-    const pressX = relX * 12;
-    const pressY = relY * 8;
-    const scale = 1 - Math.abs(relY) * 0.08;
+    heroTitle.querySelectorAll('.hero-letter').forEach((span) => {
+      const rect = span.getBoundingClientRect();
+      const centerX = rect.left + rect.width / 2;
+      const centerY = rect.top + rect.height / 2;
+      const distance = Math.hypot(event.clientX - centerX, event.clientY - centerY);
 
-    heroTitle.style.setProperty('--press-x', `${pressX}px`);
-    heroTitle.style.setProperty('--press-y', `${pressY}px`);
-    heroTitle.style.setProperty('--press-scale', scale.toFixed(3));
-    heroTitle.classList.add('is-pressed');
+      if (distance < scatterRadius) {
+        const intensity = (scatterRadius - distance) / scatterRadius;
+        const offsetX = parseFloat(span.dataset.offsetX) * scatterStrength * intensity;
+        const offsetY = parseFloat(span.dataset.offsetY) * scatterStrength * intensity;
+        const rotate = parseFloat(span.dataset.rotate) * intensity * 10;
+        span.classList.add('is-scattered');
+        span.style.transform = `translate(${offsetX}px, ${offsetY}px) rotate(${rotate}deg)`;
+        span.style.opacity = `${0.45 + (1 - intensity) * 0.45}`;
+      } else {
+        span.classList.remove('is-scattered');
+        span.style.transform = '';
+        span.style.opacity = '';
+      }
+    });
   });
 
-  heroTitle.addEventListener('mouseleave', () => {
-    heroTitle.style.setProperty('--press-x', '0px');
-    heroTitle.style.setProperty('--press-y', '0px');
-    heroTitle.style.setProperty('--press-scale', '1');
-    heroTitle.classList.remove('is-pressed');
-  });
+  heroTitle.addEventListener('mouseleave', resetLetters);
 }
 
 // 动态粒子效果 + 彩色流线
 const canvas = document.getElementById('particleCanvas');
 if (canvas) {
   const ctx = canvas.getContext('2d');
-  const particleCount = 90;
+  const particleCount = 130;
   const particles = [];
   const streaks = [];
   const pointer = { x: null, y: null, radius: 120 };
@@ -214,7 +241,7 @@ if (canvas) {
       vy: Math.sin(angle) * speed,
       life: 0,
       maxLife: 120 + Math.random() * 80,
-      width: 2 + Math.random() * 2,
+      width: 2.4 + Math.random() * 2.6,
       color: streakPalette[Math.floor(Math.random() * streakPalette.length)],
     });
   };
@@ -244,8 +271,8 @@ if (canvas) {
         const distance = Math.hypot(dx, dy) || 1;
         if (distance < pointer.radius) {
           const force = (pointer.radius - distance) / pointer.radius;
-          particle.vx += (dx / distance) * force * 0.3;
-          particle.vy += (dy / distance) * force * 0.3;
+          particle.vx += (dx / distance) * force * 0.18;
+          particle.vy += (dy / distance) * force * 0.18;
         }
       }
 
@@ -261,7 +288,7 @@ if (canvas) {
       streak.life += 1;
 
       const progress = streak.life / streak.maxLife;
-      const alpha = Math.max(0, Math.min(1, Math.sin(Math.PI * progress) * 0.6));
+      const alpha = Math.max(0, Math.min(1, Math.sin(Math.PI * progress) * 0.75));
 
       const gradient = ctx.createLinearGradient(
         streak.x,

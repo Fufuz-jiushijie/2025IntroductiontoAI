@@ -140,13 +140,22 @@ body {
   font-weight: 800;
   letter-spacing: -0.02em;
   color: #f6f7ff;
-  transform: perspective(600px) translate(var(--press-x, 0px), var(--press-y, 0px)) scale(var(--press-scale, 1));
-  transition: transform 0.15s ease, text-shadow 0.3s ease;
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 0.12em;
+  transition: text-shadow 0.3s ease;
   text-shadow: 0 12px 30px rgba(22, 93, 255, 0.35);
 }
 
-.hero-title.is-pressed {
-  text-shadow: 0 8px 24px rgba(19, 27, 113, 0.25);
+.hero-letter {
+  display: inline-block;
+  transition: transform 0.25s ease, opacity 0.25s ease, filter 0.25s ease;
+  will-change: transform, opacity, filter;
+}
+
+.hero-letter.is-scattered {
+  opacity: 0.45;
+  filter: blur(0.6px);
 }
 
 .hero-subtitle {
@@ -160,6 +169,11 @@ body {
 .hero-input,
 .hero-actions {
   text-align: left;
+}
+
+.hero-input #prompt {
+  max-width: 520px;
+  width: 100%;
 }
 
 .prompt-label {
