@@ -29,6 +29,7 @@
 
 
 <body>
+  <canvas id="particleCanvas" aria-hidden="true"></canvas>
 
 
   <!-- 粘性导航栏 -->
@@ -37,9 +38,8 @@
       <h1 class="logo">小组作业</h1>
       <ul>
         <li><a href="#" class="current">主页</a></li>
-        <li><a href="#generator">展示1</a></li>
-        <li><a href="#">展示2</a></li>
-        <li><a href="#">展示3</a></li>
+        <li><a href="#generator">生成器</a></li>
+        <li><a href="gallery.html">生成库</a></li>
       </ul>
     </div>
   </nav>
@@ -48,51 +48,38 @@
 
   <!-- 英雄区域 -->
   <div class="hero">
-    <div class="container">
-      <h1>人工智能导论小组作业</h1>
-      <p>组员：xxxxxxxxx</p>
-    </div>
-  </div>
-
-
-
-  <!-- 波浪装饰（蓝色） -->
-<div class="wave-container">
-  <svg class="waves" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 24 150 28" preserveAspectRatio="none" shape-rendering="auto">
-    <defs>
-      <path id="gentle-wave" d="M-160 44c30 0 58-18 88-18s 58 18 88 18 58-18 88-18 58 18 88 18 v44h-352z" />
-    </defs>
-    <g class="parallax">
-      <use xlink:href="#gentle-wave" x="48" y="0" fill="rgba(22, 93, 255, 0.7)" />
-      <use xlink:href="#gentle-wave" x="48" y="3" fill="rgba(22, 93, 255, 0.5)" />
-      <use xlink:href="#gentle-wave" x="48" y="5" fill="rgba(22, 93, 255, 0.3)" />
-      <use xlink:href="#gentle-wave" x="48" y="7" fill="#165DFF" />
-    </g>
-  </svg>
-</div>
-
-
-
-<!-- 文生图交互模块 -->
-<section id="generator" class="py-16 bg-white">
-  <div class="container mx-auto px-4 md:px-6">
-    <!-- 外层卡片： -->
-    <div class="generate-card bg-gray-50 rounded-3xl shadow-card hover:shadow-hover transition-all p-6 md:p-10">
-      <div class="flex flex-col md:flex-row gap-10 items-center">
-        <!-- 输入区域： -->
-        <div class="input-area w-full md:w-1/2 space-y-6">
-          <!-- 提示词 -->
-          <div class="input-group">
-            <label class="block text-gray-700 mb-2">提示词（必填）</label>
-            <textarea 
-              id="prompt" 
-              class="input-textarea w-full px-5 py-4 rounded-xl border border-gray-200 focus:border-primary focus:outline-none input-focus resize-none h-24"
-              rows="3"
-              placeholder="比如：一只可爱的猫咪，坐在草地上，水彩风格"
-            ></textarea>
-          </div>
-
-          <!-- 负提示词 -->
+    <div class="container hero-content">
+      <div class="hero-copy">
+        <h1 id="heroTitle" class="hero-title">What should we create next？</h1>
+        <p class="hero-subtitle">输入你的灵感提示词，让想象变成图像。</p>
+        <div class="hero-input">
+          <label class="block text-gray-700 mb-2">提示词（必填）</label>
+          <textarea 
+            id="prompt" 
+            class="input-textarea w-full px-5 py-4 rounded-xl border border-gray-200 focus:border-primary focus:outline-none input-focus resize-none h-24"
+            rows="3"
+            placeholder="比如：一只可爱的猫咪，坐在草地上，水彩风格"
+          ></textarea>
+        </div>
+        <div class="hero-actions">
+          <button 
+            id="generateBtn" 
+            onclick="generateImage()"
+            class="generate-btn w-full py-4 rounded-xl bg-primary text-white hover:bg-primary/90 transition-all flex items-center justify-center gap-2"
+          >
+            <i class="fa fa-magic"></i>
+            <span>生成图片</span>
+          </button>
+          <a class="gallery-link" href="gallery.html">查看生成库</a>
+        </div>
+        <div id="loading" class="text-center text-gray-600 py-2 hidden">
+          生成中...大约10-20s，请耐心等待
+        </div>
+        <div id="statusMessage" class="text-center text-gray-600 py-2 hidden"></div>
+      </div>
+      <div class="hero-visual">
+        <div class="hero-glass">
+          <h3>灵感参数</h3>
           <div class="input-group">
             <label class="block text-gray-700 mb-2">负提示词（可选）</label>
             <textarea 
@@ -102,8 +89,6 @@
               placeholder="比如：模糊，变形，低画质"
             ></textarea>
           </div>
-
-          <!-- 图片尺寸 -->
           <div class="input-group">
             <label class="block text-gray-700 mb-2">图片尺寸（宽x高，8的倍数，默认512x512）</label>
             <input 
@@ -114,8 +99,6 @@
               class="w-full px-5 py-3 rounded-xl border border-gray-200 focus:border-primary focus:outline-none"
             >
           </div>
-
-          <!-- 采样步数 -->
           <div class="input-group">
             <label class="block text-gray-700 mb-2">采样步数（默认20）</label>
             <input 
@@ -127,33 +110,26 @@
               class="w-full px-5 py-3 rounded-xl border border-gray-200 focus:border-primary focus:outline-none"
             >
           </div>
-
-          <!-- 生成按钮 -->
-          <button 
-            id="generateBtn" 
-            onclick="generateImage()"
-            class="generate-btn w-full py-4 rounded-xl bg-primary text-white hover:bg-primary/90 transition-all flex items-center justify-center gap-2"
-          >
-            <i class="fa fa-magic"></i>
-            <span>生成图片</span>
-          </button>
-
-          <!-- 加载状态 -->
-          <div id="loading" class="text-center text-gray-600 py-2 hidden">
-            生成中...大约10-20s，请耐心等待
-          </div>
+          <p class="hero-tip">生成内容会自动保存到生成库页面。</p>
         </div>
+      </div>
+    </div>
+  </div>
 
-        <div class="preview-area w-full md:w-1/2">
-          <div id="result" class="preview-box bg-white rounded-2xl shadow-md overflow-hidden aspect-[4/3] flex flex-col items-center justify-center p-4">
-            <h3 class="text-lg font-medium text-gray-800 mb-4">生成结果</h3>
-            <img 
-              id="imageOutput" 
-              style="max-width: 100%; max-height: 80%;"
-              class="object-contain"
-            >
-          </div>
-        </div>
+
+
+<!-- 文生图交互模块 -->
+<section id="generator" class="py-10 bg-transparent">
+  <div class="container mx-auto px-4 md:px-6">
+    <div class="generate-card rounded-3xl shadow-card transition-all p-6 md:p-10">
+      <div class="card-copy">
+        <h2>灵感，马上落地</h2>
+        <p>生成内容会自动保存到“生成库”页面，方便随时回看和管理。</p>
+      </div>
+      <div class="card-meta">
+        <div class="meta-chip">动态粒子背景</div>
+        <div class="meta-chip">标题交互形变</div>
+        <div class="meta-chip">生成内容自动归档</div>
       </div>
     </div>
   </div>
@@ -167,4 +143,3 @@
 
 </body>
 </html>
-
