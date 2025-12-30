@@ -11,6 +11,12 @@ from datetime import datetime
 from pathlib import Path
 import shutil
 from typing import List, Optional
+# ===== 新增：调用豆包API所需模块 =====
+import requests
+# ===== 替换：阿里云通义千问所需模块 =====
+import dashscope
+from dashscope import Generation
+# 保留原有其他导入（FastAPI/模型等）
 
 # 初始化FastAPI
 app = FastAPI(title="AI Image Generator API")
@@ -28,6 +34,9 @@ app.add_middleware(
 OUTPUT_DIR = "./imaginairy_output"
 GENERATED_DIR = os.path.join(OUTPUT_DIR, "generated")
 IMAGE_METADATA_FILE = os.path.join(OUTPUT_DIR, "metadata.json")
+
+
+dashscope.api_key = "sk-f34678aa8d534fe587645fedbd83dac1" 
 
 # 确保目录存在
 for dir_path in [OUTPUT_DIR, GENERATED_DIR]:
@@ -59,6 +68,9 @@ class ImageInfo(BaseModel):
 
 class DeleteRequest(BaseModel):
     filenames: List[str]
+# ===== 新增：描述生成请求模型 =====
+class DescriptionRequest(BaseModel):
+    keywords: str  # 前端传递的关键词
 
 def load_metadata():
     """加载图片元数据"""
@@ -186,6 +198,66 @@ async def generate_image(request: ImageRequest):
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"生成失败：{str(e)}")
+    
+@app.post("/generate")
+async def generate_description(request: DescriptionRequest):
+    """根据关键词调用阿里云通义千问生成描述文字"""
+    try:
+        # 1. 参数校验
+        if not request.keywords.strip():
+            raise ValueError("关键词不能为空！")
+        
+        print(f"【调试】接收的关键词：{request.keywords.strip()}")
+        
+        # 2. 调用通义千问
+        response = Generation.call(
+            model='qwen-turbo',
+            messages=[
+                {
+                    "role": "user",
+                    "content": f"请根据关键词【{request.keywords.strip()}】生成一段生动、详细的描述性文字，字数控制在200字左右，语言优美自然，适配AI图片生成的提示词场景。"
+                }
+            ],
+            temperature=0.7,
+            max_tokens=500
+        )
+        
+        # 3. 打印完整响应（确认结构）
+        print(f"【调试】阿里云原始响应：{response}")
+        
+        # 4. 校验响应状态
+        if response.status_code != 200:
+            raise RuntimeError(f"通义千问调用失败：{response.message if hasattr(response, 'message') else '未知错误'}")
+        
+        # 5. 关键：解析output.text（而非choices）
+        if not hasattr(response, 'output') or response.output is None:
+            raise RuntimeError("API返回无output字段")
+        
+        # 读取真实的描述内容（output.text）
+        description = getattr(response.output, 'text', '').strip()
+        if not description:
+            raise RuntimeError("API返回的描述内容为空")
+        
+        # 6. 正常返回
+        return {
+            "success": True,
+            "content": description,
+            "keywords": request.keywords.strip()
+        }
+    
+    except ValueError as e:
+        print(f"【错误】参数校验失败：{str(e)}")
+        raise HTTPException(status_code=400, detail={"success": False, "message": str(e)})
+    except Exception as e:
+        import traceback
+        error_msg = f"生成描述失败：{str(e)}"
+        print(f"【错误】{error_msg}")
+        print(f"【错误】堆栈：{traceback.format_exc()}")
+        # 规范返回错误格式，确保前端能解析
+        raise HTTPException(
+            status_code=500,
+            detail={"success": False, "message": error_msg}
+        )
 
 @app.get("/api/images", response_model=List[ImageInfo])
 async def get_images(page: int = Query(1, ge=1), per_page: int = Query(20, ge=1, le=100)):

@@ -558,3 +558,157 @@ body {
     padding: 0 16px;
   }
 }
+
+/* 模态框遮罩层 */
+.modal-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(6, 7, 15, 0.85); /* 贴合页面背景的深色遮罩 */
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  backdrop-filter: blur(4px); /* 玻璃模糊效果，和页面质感统一 */
+}
+
+/* 模态框内容区 - 玻璃质感+蓝紫边框+大圆角 */
+.modal-content {
+  width: 520px; /* 微调宽度更协调 */
+  background: rgba(12, 15, 30, 0.95); /* 页面同款深色玻璃背景 */
+  border: 1px solid rgba(122, 163, 255, 0.25); /* 页面同款淡蓝紫边框 */
+  border-radius: 18px; /* 和inspire-panel统一的大圆角 */
+  padding: 24px;
+  box-shadow: 0 12px 40px rgba(22, 93, 255, 0.25); /* 蓝紫调微光阴影 */
+  color: #f5f7ff; /* 页面主文字色 */
+  position: relative;
+  animation: modalFadeIn 0.3s ease-out; /* 渐入动画 */
+}
+
+/* 模态框标题样式 */
+.modal-content h3 {
+  font-size: 20px;
+  font-weight: 700;
+  color: #f6f7ff; /* 和hero-title统一 */
+  margin-bottom: 20px;
+  letter-spacing: -0.02em;
+}
+
+/* 关键词输入框 - 复用页面textarea样式 */
+#keywordInput {
+  width: 100%;
+  height: 80px;
+  margin: 10px 0 16px;
+  padding: 14px 16px;
+  font-size: 14px;
+  border: 1px solid rgba(122, 163, 255, 0.35); /* 页面同款边框 */
+  border-radius: 12px; /* 圆角适配 */
+  resize: none;
+  background: rgba(8, 10, 22, 0.8); /* 页面同款输入框背景 */
+  color: #f5f7ff; /* 文字色 */
+  font-family: 'Open Sans', sans-serif; /* 统一字体 */
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* 输入框聚焦样式 - 复用页面input-focus */
+#keywordInput:focus {
+  outline: none;
+  border-color: rgba(122, 163, 255, 0.6);
+  box-shadow: 0 0 0 3px rgba(22, 93, 255, 0.2); /* 和input-focus统一 */
+}
+
+#keywordInput::placeholder {
+  color: rgba(193, 205, 255, 0.6); /* 页面同款占位符色 */
+}
+
+/* 结果标题 */
+.result-title {
+  margin: 10px 0 8px;
+  font-size: 14px;
+  color: rgba(193, 205, 255, 0.9); /* 页面标签色 */
+}
+
+/* 结果展示框 - 复用输入框样式，增加高度适配 */
+#resultArea {
+  width: 100%;
+  height: 160px;
+  margin: 0 0 20px;
+  padding: 14px 16px;
+  font-size: 14px;
+  border: 1px solid rgba(122, 163, 255, 0.25); /* 略淡的边框区分状态 */
+  border-radius: 12px;
+  resize: none;
+  background: rgba(8, 10, 22, 0.9); /* 略深的背景区分结果区 */
+  color: #f5f7ff;
+  font-family: 'Open Sans', sans-serif;
+  line-height: 1.5;
+}
+
+/* 弹窗按钮组 - 布局优化 */
+.modal-btns {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+/* 关闭按钮 - 贴合页面按钮风格 */
+#closeModalBtn {
+  padding: 10px 20px;
+  background: rgba(16, 20, 44, 0.9); /* 页面clear-btn同款背景 */
+  border: 1px solid rgba(122, 163, 255, 0.3); /* 统一边框 */
+  border-radius: 999px; /* 圆形按钮，和inspire-toggle统一 */
+  color: #7aa3ff; /* 页面主强调色 */
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: 'Open Sans', sans-serif;
+}
+
+#closeModalBtn:hover {
+  background: rgba(122, 163, 255, 0.2);
+  border-color: rgba(122, 163, 255, 0.5);
+  transform: translateY(-1px);
+}
+
+/* 生成按钮 - 主按钮风格，贴合页面action按钮 */
+#submitKeywordBtn {
+  padding: 10px 20px;
+  background: rgba(22, 93, 255, 0.18); /* 蓝紫渐变底 */
+  border: 1px solid rgba(122, 163, 255, 0.5);
+  border-radius: 999px;
+  color: #7aa3ff;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: 'Open Sans', sans-serif;
+}
+
+#submitKeywordBtn:hover {
+  background: rgba(22, 93, 255, 0.28);
+  box-shadow: 0 8px 20px rgba(22, 93, 255, 0.2);
+  transform: translateY(-1px);
+}
+
+#submitKeywordBtn:disabled {
+  background: rgba(16, 20, 44, 0.6);
+  border-color: rgba(122, 163, 255, 0.2);
+  color: rgba(193, 205, 255, 0.6);
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* 模态框渐入动画 */
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
