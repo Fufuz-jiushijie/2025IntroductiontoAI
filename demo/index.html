@@ -3,16 +3,17 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <!-- 引入外部CDN资源 -->
+  <!-- 引入Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
+  <!-- 引入字体图标 -->
   <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
-  <!-- 配置Tailwind自定义主题 -->
+  <!-- 配置Tailwind自定义主题（主色、阴影） -->
   <script>
     tailwind.config = {
       theme: {
         extend: {
           colors: {
-            primary: '#165DFF',
+            primary: '#165DFF', // 主题主色
           },
           boxShadow: {
             'card': '0 10px 30px -5px rgba(0, 0, 0, 0.1)',
@@ -22,34 +23,28 @@
       }
     }
   </script>
-  <!-- 引入自定义CSS -->
   <link rel="stylesheet" href="style.css" />
   <title>AI文生图 - 小组作业</title>
 </head>
-
-
 <body>
-
-<!-- 新增：豆包生成描述的模态框 -->
-<div class="modal-mask" id="doubaoModal">
-  <div class="modal-content">
-    <h3>输入关键词生成描述</h3>
-    <!-- 关键词输入框 -->
-    <textarea id="keywordInput" placeholder="请输入关键词，例如：春日公园、治愈系咖啡"></textarea>
-    <!-- 生成结果展示框 -->
-    <div class="result-title">生成结果：</div>
-    <textarea id="resultArea" readonly></textarea>
-    <!-- 弹窗按钮组 -->
-    <div class="modal-btns">
-      <button id="closeModalBtn">关闭</button>
-      <button id="submitKeywordBtn">生成</button>
+  <!-- 灵感关键词生成模态框 -->
+  <div class="modal-mask" id="doubaoModal">
+    <div class="modal-content">
+      <h3>输入关键词生成描述</h3>
+      <textarea id="keywordInput" placeholder="请输入关键词，例如：春日公园、治愈系咖啡"></textarea>
+      <div class="result-title">生成结果：</div>
+      <textarea id="resultArea" readonly></textarea>
+      <div class="modal-btns">
+        <button id="closeModalBtn">关闭</button>
+        <button id="submitKeywordBtn">生成</button>
+      </div>
     </div>
   </div>
-</div>
 
+  <!-- 粒子背景画布（全屏动态背景） -->
   <canvas id="particleCanvas" aria-hidden="true"></canvas>
-  
-  <!-- 英雄区域 -->
+
+  <!-- 核心操作区：AI文生图输入与生成 -->
   <div class="hero">
     <div class="container hero-content">
       <div class="hero-copy">
@@ -58,6 +53,7 @@
         <div class="hero-input">
           <div class="prompt-label">
             <label class="block text-gray-700 mb-2">提示词（必填）</label>
+            <!-- 灵感按钮：打开/关闭关键词生成模态框 -->
             <button id="inspireToggle" class="inspire-toggle" type="button" aria-label="灵感参数">
               <i class="fa fa-lightbulb-o" aria-hidden="true"></i>
               <span class="inspire-tooltip">灵感</span>
@@ -69,40 +65,9 @@
             rows="3"
             placeholder="比如：一只可爱的猫咪，坐在草地上，水彩风格"
           ></textarea>
-          <div id="inspirePanel" class="inspire-panel ">
-            <div class="input-group">
-              <label class="block text-gray-700 mb-2">负提示词（可选）</label>
-              <textarea 
-                id="negativePrompt" 
-                class="input-textarea w-full px-5 py-4 rounded-xl border border-gray-200 focus:border-primary focus:outline-none input-focus resize-none h-16"
-                rows="2"
-                placeholder="比如：模糊，变形，低画质"
-              ></textarea>
-            </div>
-            <div class="input-group">
-              <label class="block text-gray-700 mb-2">图片尺寸（宽x高，8的倍数，默认512x512）</label>
-              <input 
-                type="text" 
-                id="size" 
-                value="512x512" 
-                placeholder="如：512x512、256x256"
-                class="w-full px-5 py-3 rounded-xl border border-gray-200 focus:border-primary focus:outline-none"
-              >
-            </div>
-            <div class="input-group">
-              <label class="block text-gray-700 mb-2">采样步数（默认20）</label>
-              <input 
-                type="number" 
-                id="steps" 
-                value="20" 
-                min="1" 
-                max="50"
-                class="w-full px-5 py-3 rounded-xl border border-gray-200 focus:border-primary focus:outline-none"
-              >
-            </div>
-          </div>
         </div>
         <div class="hero-actions">
+          <!-- 生成图片按钮：触发后端接口生成图片 -->
           <button 
             id="generateBtn" 
             onclick="generateImage()"
@@ -113,17 +78,16 @@
           </button>
           <a class="gallery-link" href="gallery.html">查看生成库</a>
         </div>
+        <!-- 加载状态提示 -->
         <div id="loading" class="text-center text-gray-600 py-2 hidden">
           生成中...大约10-20s，请耐心等待
         </div>
+        <!-- 结果状态提示 -->
         <div id="statusMessage" class="text-center text-gray-600 py-2 hidden"></div>
       </div>
     </div>
   </div>
 
-  <!-- 引入自定义JS -->
   <script src="script.js"></script>
-
-
 </body>
 </html>
